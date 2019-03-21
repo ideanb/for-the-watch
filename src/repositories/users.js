@@ -4,20 +4,21 @@ const find = async userId => {
   return knex('users').where({ id: userId });
 };
 
-const topActiveUsers = () => {
+const topActiveUsers = (offset, limit) => {
   const query = `
     select max(u.id) as id,
-    count(ap.listing_id) as total_applications,
-    max(u.name) as name,
     max(u.created_at) as created_at,
-    array_agg(DISTINCT l.name) as listings
+    max(u.name) as name,
+    count(distinct ap.listing_id) as count,
+    (array_agg(DISTINCT l.name))[1:3] as listings
     from applications ap
     join users u on u.id = ap.user_id
     join listings l on l.id = ap.listing_id
     group by ap.user_id
-    order by total_applications desc
-    offset 0 limit 3;
+    order by count desc
+    offset ${offset} limit ${limit};
   `;
+  return knex.raw(query);
 };
 
 module.exports = {

@@ -1,20 +1,18 @@
-const getTopActiveUsers = (req, res) => {
-  res.json([{ name: 'iduart' }, { name: 'Dean' }]);
+const usersRepository = require('../../repositories/users');
+const utils = require('../../utils');
 
-  // [
-  //   {
-  //     id: {users.id},
-  //     createdAt: {users.created_at},
-  //     name: {users.name},
-  //     count: {count of applications in the past week's time}
-  //     listings: [
-  //       {listings.name},
-  //       {listings.name},
-  //       {listings.name}
-  //     ]
-  //   },
-  //   ...
-  // ]
+const getTopActiveUsers = async (req, res) => {
+  try {
+    const { page = 1, size = 3 } = req.query;
+    const offset = utils.getOffset(page, size);
+    const { rows: topUsers } = await usersRepository.topActiveUsers(
+      offset,
+      size
+    );
+    res.send(topUsers);
+  } catch (err) {
+    res.status(500).send(err);
+  }
 };
 
 module.exports = getTopActiveUsers;
