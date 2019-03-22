@@ -1,7 +1,48 @@
 const knex = require('../helpers/knex');
 
 const find = async userId => {
-  return knex('users').where({ id: userId });
+  const query = `
+    select u.id,
+    max(u.name) as name,
+    max(u.created_at) as created_at,
+    coalesce(
+      json_agg(
+        distinct c.*
+        )
+      FILTER (WHERE c.id IS NOT NULL), '[]'
+    ) as companies,
+    coalesce(
+      json_agg(distinct l.*)
+      FILTER (WHERE l.id IS NOT NULL), '[]'
+    ) as listings,
+    (
+      select coalesce(
+        array_agg(
+          json_build_object(
+            'id', app.id,
+            'created_at', app.created_at,
+            'listing', json_build_object(
+              'id', li.id,
+              'name', li.name,
+              'description', li.description
+            ),
+            'cover_letter', app.cover_letter
+          )
+        )
+      )
+      from applications app
+      join listings li on li.id = app.listing_id
+      where app.user_id = u.id
+    ) as applications
+    from users u
+    left join teams t on t.user_id = u.id
+    left join companies c on c.id = t.company_id
+    left join listings l on l.created_by = u.id 
+    where u.id = ${userId}
+    group by u.id;
+  `;
+
+  return knex.raw(query);
 };
 
 const topActiveUsers = (offset, limit) => {
