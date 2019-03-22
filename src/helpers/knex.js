@@ -2,7 +2,7 @@ const { CONNECTION_STRING } = process.env;
 
 const knex = require('knex')({
   client: 'pg',
-  connection: 'postgres://postgres:123456@localhost:5432/test'
+  connection: CONNECTION_STRING
 });
 
 module.exports = knex;

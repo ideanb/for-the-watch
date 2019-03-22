@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "lint": "eslint --fix src"
+    "lint": "eslint --fix src",
+    "test": "jest --watch",
+    "coverage": "jest --watch --coverage src/__tests__"
   },
   "keywords": [],
   "author": "Iduart Dean",
@@ -25,9 +27,20 @@
     "pg": "^7.9.0"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
     "eslint": "^5.12.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",
-    "nodemon": "^1.18.9"
+    "jest": "^24.5.0",
+    "nodemon": "^1.18.9",
+    "sinon": "^7.3.0",
+    "supertest": "^4.0.2"
+  },
+  "jest": {
+    "modulePaths": [
+      "<rootDir>/src"
+    ],
+    "verbose": false,
+    "testEnvironment": "node"
   }
 }
